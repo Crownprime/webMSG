@@ -1,7 +1,7 @@
-;(function(win,doc) {
+;(function(win, doc, $) {
 
 let WebMSG = function() {
-    this.div = doc.getElementById('webMSG');
+    this.div = $('#webMSG');
 };
 
 WebMSG.prototype = {
@@ -9,19 +9,32 @@ WebMSG.prototype = {
 
     options: {
         text: '默认提示文本',
+        top: 80,
+        hiddenRight: -300,
+        showRight: 30,
+        overRight: 15,
+        showTime: 500,
+        overTime: 100,
+        showEasing: 'linear',
+        width: 240,
+        padding: '0 24px',
+        borderRadius: 3,
+        lineHeight: 44,
+        color: 'white',
+        backgroundColor: '#fd79a8',
     },
     init: function(opts) {
         let _self = this;
-        let option = config(opts, _self.options);
-        _self.div.innerText = option.text;
-        styleSet(_self.div);
+        _self.options = config(opts, _self.options);
+        _self.div.text(_self.options.text);
+        styleSet(_self.div, _self.options);
     },
     show: function(text = this.options.text) {
         let _self = this;
-        _self.div.innerText = text;
-        show(this.div);
+        _self.div.text(text);
+        show(_self.div, _self.options);
         setTimeout(() => {
-            hidden(_self.div);
+            hidden(_self.div, _self.options);
         }, 3000);
     }
 }
@@ -36,71 +49,31 @@ function config(opts, options) {
     return options;
 }
 
-function show(elem) {
-    let right = -300;
-    let over = 0;
-    let showId = setInterval(moveOn, 10);
-    function moveOn() {
-        if(over == 0 && right < 45) {
-            right += 5;
-            elem.style.right = right + 'px';
-        }
-        else if(over == 0 && right >= 45) {
-            over = 1;
-        }
-
-
-        if(over == 1 && right > 30) {
-            right -= 1;
-            elem.style.right = right + 'px';
-        }
-        else if(over == 1 && right <= 30) {
-            clearInterval(showId);
-        }
-    }
+function show(elem, opts) {
+    elem.animate({right: '45px'}, 500, 'linear');
+    elem.animate({right: '30px'}, 100, 'linear');
 }
 
-function hidden(elem) {
-    let right = 30;
-    let over = 0;
-    let hiddenId = setInterval(moveOff, 10);
-    function moveOff() {
-        if(over == 0 && right < 45) {
-            right += 1;
-            elem.style.right = right + 'px';
-        }
-        else if(over == 0 && right >= 45) {
-            over = 1;
-        }
-
-
-        if(over == 1 && right > -300) {
-            right -= 5;
-            elem.style.right = right + 'px';
-        }
-        else if(over == 1 && right <= -300) {
-            clearInterval(hiddenId);
-        }
-    }
+function hidden(elem, opts) {
+    elem.animate({right: '45px'}, 100, 'linear');
+    elem.animate({right: '-300px'}, 500, 'linear');
 }
 
-function styleSet(elem) {
+function styleSet(elem, opts) {
     styles = {
         boxSizing: 'border-box',
         position: 'fixed',
-        top: '80px',
-        right: '30px',
-        width: '240px',
-        padding: '0 15px',
-        borderRadius: '3px',
-        lineHeight: '44px',
-        color: 'white',
-        backgroundColor: '#fd79a8'
+        top: opts.top + 'px',
+        right: opts.hiddenRight + 'px',
+        width: opts.width + 'px',
+        padding: opts.padding,
+        borderRadius: opts.borderRadius + 'px',
+        lineHeight: opts.lineHeight + 'px',
+        color: opts.color,
+        backgroundColor: opts.backgroundColor
     }
-    for(let key in styles) {
-        elem.style[key] = styles[key];
-    }
+    elem.css(styles);
 }
 
 win.WebMSG = WebMSG;
-}(window,document));
+}(window,document,jQuery));
